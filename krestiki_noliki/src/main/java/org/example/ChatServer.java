@@ -1,51 +1,52 @@
 package org.example;
 
+import javax.swing.*;
+
 public class ChatServer {
     boolean statusServer;
-    private chatServerCommandListener serverListener;
+    private ChatServerListener chatServerListener = new ChatServerListener();
+    ServerSocketThread serverSocketThread = new ServerSocketThread(this);
 
     public ChatServer(boolean statusServer) {
         this.statusServer = statusServer;
     }
 
-
-
-}
-
-interface chatServerCommandListener {
-    void onMessageRecived(ChatServer chatServer);
-}
-
-class StartServerCommand implements chatServerCommandListener{
-    ServerWindow serverWindow;
-    StartServerCommand(ServerWindow serverWindow) {
-        this.serverWindow = serverWindow;
-    }
-
-    @Override
-    public void onMessageRecived(ChatServer chatServer) {
-        if(chatServer.statusServer)
-            serverWindow.serverMsg.append("server already start\n");
+    void start(){
+        if (statusServer){
+            chatServerListener.onMessageRecived("ServerMSG: Server already run");
+        }
         else {
-            serverWindow.serverMsg.append("server start\n");
-            chatServer.statusServer = true;
+            chatServerListener.onMessageRecived("ServerMSG: Server run");
+            serverSocketThread.onStart();
+            statusServer = true;
         }
     }
-}
 
-class StopServerCommand implements chatServerCommandListener{
-
-    ServerWindow serverWindow;
-    StopServerCommand(ServerWindow serverWindow) {
-        this.serverWindow = serverWindow;
-    }
-    @Override
-    public void onMessageRecived(ChatServer chatServer) {
-        if(!chatServer.statusServer)
-            serverWindow.serverMsg.append("server already stop\n");
+    void stop(){
+        if (!statusServer){
+            chatServerListener.onMessageRecived("ServerMSG: Server already stop");
+        }
         else {
-            serverWindow.serverMsg.append("server stop\n");
-            chatServer.statusServer = false;
+            chatServerListener.onMessageRecived("ServerMSG: Server stop");
+            serverSocketThread.onStop();
+            statusServer = false;
         }
     }
+
+
+
 }
+
+interface ChatServerCommandListener {
+    void onMessageRecived(String message);
+}
+
+interface ServerSocketThreadListener{
+    void onStart();
+    void onStop();
+}
+
+interface SocketThreadListener{
+    void prsBtn(JButton btn);
+}
+

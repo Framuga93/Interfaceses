@@ -15,8 +15,8 @@ public class ServerWindow extends JFrame {
     JButton btnExit = new JButton("Stop server");
     JTextArea serverMsg = new JTextArea();
     ChatServer chatServer = new ChatServer(false);
-    StartServerCommand startServerCommand = new StartServerCommand(this);
-    StopServerCommand stopServerCommand = new StopServerCommand(this);
+    ChatSocketThread chatSocketThreadListener = new ChatSocketThread(this);
+
 
     ServerWindow(){
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -34,13 +34,15 @@ public class ServerWindow extends JFrame {
         btnStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                startServerCommand.onMessageRecived(chatServer);
+                chatServer.start();
+                chatSocketThreadListener.prsBtn(btnStart);
             }
         });
         btnExit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                stopServerCommand.onMessageRecived(chatServer);
+                chatServer.stop();
+                chatSocketThreadListener.prsBtn(btnExit);
             }
         });
 
